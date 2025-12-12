@@ -1,0 +1,6 @@
+// dashboard.js - Dashboard functions
+
+// This file is for future expansion
+// For now, auth.js handles everything
+
+console.log("Dashboard loaded");

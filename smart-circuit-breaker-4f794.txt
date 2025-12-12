@@ -1,0 +1,24 @@
+smart-circuit-breaker-4f794
+npm install -g firebase-tools
+firebase login
+firebase init
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyClU4ScNXfkGsz9RYA4M3iEbojUKfxFlxo",
+  authDomain: "smart-circuit-breaker-4f794.firebaseapp.com",
+  databaseURL: "https://smart-circuit-breaker-4f794-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "smart-circuit-breaker-4f794",
+  storageBucket: "smart-circuit-breaker-4f794.firebasestorage.app",
+  messagingSenderId: "563895868990",
+  appId: "1:563895868990:web:f58faad8b2f1724218fb6f"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+modular JavaScript SDK
+ smart-circuit-breaker-4f794.web.app

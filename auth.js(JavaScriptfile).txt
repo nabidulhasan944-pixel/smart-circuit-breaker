@@ -1,0 +1,214 @@
+// auth.js - Authentication
+
+// Check auth state
+document.addEventListener('DOMContentLoaded', function() {
+    checkAuthState();
+});
+
+function checkAuthState() {
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            // User logged in
+            console.log("User:", user.email);
+            showDashboard();
+        } else {
+            // No user
+            showLoginPage();
+        }
+    });
+}
+
+function showLoginPage() {
+    const mainContent = document.getElementById('main-content');
+    mainContent.innerHTML = `
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white text-center">
+                            <h4>IGBT Controller Login</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <label>Email</label>
+                                <input type="email" id="login-email" class="form-control" 
+                                       placeholder="admin@example.com">
+                            </div>
+                            <div class="mb-3">
+                                <label>Password</label>
+                                <input type="password" id="login-password" class="form-control" 
+                                       placeholder="••••••••">
+                            </div>
+                            <button class="btn btn-primary w-100" onclick="login()">
+                                Login
+                            </button>
+                            <hr>
+                            <button class="btn btn-success w-100" onclick="createAdmin()">
+                                Create Admin Account
+                            </button>
+                            <div class="mt-3 text-center">
+                                <small class="text-muted">Demo: admin@test.com / 123456</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function showDashboard() {
+    const mainContent = document.getElementById('main-content');
+    mainContent.innerHTML = `
+        <div class="container mt-3">
+            <h2><i class="bi bi-speedometer2"></i> Dashboard</h2>
+            
+            <!-- Status Cards -->
+            <div class="row mt-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-header bg-success">
+                            Voltage
+                        </div>
+                        <div class="card-body">
+                            <h1 id="voltage" class="display-4">230</h1>
+                            <p>Volts</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-header bg-warning">
+                            Current
+                        </div>
+                        <div class="card-body">
+                            <h1 id="current" class="display-4">5.2</h1>
+                            <p>Amps</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-header bg-danger">
+                            Power
+                        </div>
+                        <div class="card-body">
+                            <h1 id="power" class="display-4">1196</h1>
+                            <p>Watts</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-header bg-info">
+                            Status
+                        </div>
+                        <div class="card-body">
+                            <h3><span id="status" class="badge bg-danger">OFF</span></h3>
+                            <p>IGBT Status</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Control Buttons -->
+            <div class="row mt-4">
+                <div class="col-md-6 offset-md-3 text-center">
+                    <div class="btn-group btn-group-lg" role="group">
+                        <button class="btn btn-success" onclick="controlIGBT('ON')">
+                            <i class="bi bi-power"></i> TURN ON
+                        </button>
+                        <button class="btn btn-danger" onclick="controlIGBT('OFF')">
+                            <i class="bi bi-power"></i> TURN OFF
+                        </button>
+                        <button class="btn btn-warning" onclick="controlIGBT('RESET')">
+                            <i class="bi bi-arrow-clockwise"></i> RESET
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Logout -->
+            <div class="row mt-5">
+                <div class="col text-center">
+                    <button class="btn btn-secondary" onclick="logout()">
+                        <i class="bi bi-box-arrow-right"></i> Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Start updating time
+    updateTime();
+    setInterval(updateTime, 1000);
+}
+
+function updateTime() {
+    const now = new Date();
+    const timeStr = now.getHours().toString().padStart(2, '0') + ':' +
+                   now.getMinutes().toString().padStart(2, '0') + ':' +
+                   now.getSeconds().toString().padStart(2, '0');
+    document.getElementById('current-time').textContent = timeStr;
+}
+
+function login() {
+    const email = document.getElementById('login-email').value || 'admin@test.com';
+    const password = document.getElementById('login-password').value || '123456';
+    
+    auth.signInWithEmailAndPassword(email, password)
+        .then(user => {
+            alert('Login successful!');
+        })
+        .catch(error => {
+            alert('Login failed: ' + error.message);
+        });
+}
+
+function createAdmin() {
+    const email = prompt('Enter admin email:');
+    if (!email) return;
+    
+    const password = prompt('Enter password (min 6 characters):');
+    if (!password || password.length < 6) {
+        alert('Password must be 6+ characters');
+        return;
+    }
+    
+    auth.createUserWithEmailAndPassword(email, password)
+        .then(user => {
+            // Add to database
+            database.ref('users/' + user.user.uid).set({
+                email: email,
+                role: 'admin',
+                created: Date.now()
+            });
+            alert('Admin account created! Login with: ' + email);
+        })
+        .catch(error => {
+            alert('Error: ' + error.message);
+        });
+}
+
+function logout() {
+    auth.signOut()
+        .then(() => {
+            alert('Logged out');
+        });
+}
+
+function controlIGBT(action) {
+    alert('Command sent: ' + action);
+    // Update status
+    document.getElementById('status').textContent = action === 'ON' ? 'ON' : 'OFF';
+    document.getElementById('status').className = action === 'ON' ? 'badge bg-success' : 'badge bg-danger';
+}
+
+// Make functions available globally
+window.login = login;
+window.createAdmin = createAdmin;
+window.logout = logout;
+window.controlIGBT = controlIGBT;
