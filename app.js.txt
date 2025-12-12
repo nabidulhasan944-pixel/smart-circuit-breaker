@@ -1,0 +1,22 @@
+// app.js - Main application
+
+console.log("IGBT Controller App loaded");
+
+// Update time every second
+function updateTime() {
+    const now = new Date();
+    const timeStr = now.getHours().toString().padStart(2, '0') + ':' +
+                   now.getMinutes().toString().padStart(2, '0') + ':' +
+                   now.getSeconds().toString().padStart(2, '0');
+    
+    const timeElement = document.getElementById('current-time');
+    if (timeElement) {
+        timeElement.textContent = timeStr;
+    }
+}
+
+// Start updating time
+setInterval(updateTime, 1000);
+updateTime(); // Initial call
+
+console.log("App initialized successfully!");
